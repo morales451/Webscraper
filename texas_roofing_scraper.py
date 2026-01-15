@@ -166,15 +166,31 @@ def scrape_google_maps_results(page, city, zip_code):
     try:
         # Navigate to Google Maps
         page.goto("https://www.google.com/maps", timeout=30000)
-        time.sleep(2)
+        time.sleep(3)
+
+        # Handle cookie consent dialog if it appears
+        try:
+            # Try to click "Accept all" or "Reject all" button for cookies
+            accept_button = page.locator('button:has-text("Accept all"), button:has-text("Reject all"), form:has-text("Accept") >> button').first
+            if accept_button.is_visible(timeout=3000):
+                accept_button.click()
+                time.sleep(2)
+        except:
+            pass  # No cookie dialog or already accepted
+
+        # Wait for search box to be available and visible
+        search_box = page.locator('input[id="searchboxinput"]')
+        search_box.wait_for(state="visible", timeout=10000)
+        search_box.click()
+        time.sleep(0.5)
 
         # Find search box and enter query
-        search_box = page.locator('input[id="searchboxinput"]')
         search_box.fill(search_query)
+        time.sleep(0.5)
         search_box.press("Enter")
 
         # Wait for results to load
-        time.sleep(3)
+        time.sleep(5)  # Increased wait time for results
 
         # Scroll through results to load more companies
         results_panel = page.locator('div[role="feed"]').first

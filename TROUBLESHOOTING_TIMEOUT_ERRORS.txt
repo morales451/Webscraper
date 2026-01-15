@@ -1,0 +1,236 @@
+================================================================================
+              ⚠️  FIXING TIMEOUT ERRORS - TROUBLESHOOTING GUIDE
+================================================================================
+
+You're getting this error:
+  "Locator.fill: Timeout 30000ms exceeded"
+  "waiting for locator("input[id=\"searchboxinput\"]")"
+
+This means Google Maps won't let the script find the search box.
+
+================================================================================
+
+🔍 STEP 1: RUN THE DIAGNOSTIC TEST
+────────────────────────────────────────────────────────────────────────────
+
+Double-click: TEST_CONNECTION.bat
+
+This will:
+  ✓ Open Google Maps
+  ✓ Take screenshots of what you see
+  ✓ Show you what's blocking the scraper
+
+Look at the screenshots it creates to see if there's:
+  - A cookie consent dialog
+  - A CAPTCHA ("I'm not a robot")
+  - An error page
+  - Something else blocking access
+
+================================================================================
+
+🛠️ COMMON CAUSES & SOLUTIONS
+────────────────────────────────────────────────────────────────────────────
+
+❌ CAUSE 1: Cookie Consent Dialog
+──────────────────────────────────
+
+SYMPTOM: You see "Accept all" or "Accept cookies" buttons on the page
+
+SOLUTION: I've updated the scraper to handle this automatically!
+  1. Make sure you have the latest version of the scripts
+  2. Try running RUN_DEMO.bat again
+  3. The script should now click through the cookie dialog
+
+
+❌ CAUSE 2: CAPTCHA / Bot Detection
+────────────────────────────────────
+
+SYMPTOM: You see "I'm not a robot" or CAPTCHA challenges
+
+WHY: Google detected automated traffic and is blocking you
+
+SOLUTIONS (try in order):
+
+  Option A: Wait and Try Again
+    • Wait 2-4 hours
+    • Google's block is usually temporary
+    • Try during off-peak hours (late night/early morning)
+
+  Option B: Use a Different Network
+    • Switch from WiFi to mobile hotspot (or vice versa)
+    • Try from a different location
+    • Use a VPN (change your location)
+
+  Option C: Clear Browser Data
+    • The script uses Chromium browser
+    • Close the script
+    • Delete folder: C:\Users\YourName\AppData\Local\ms-playwright
+    • Run: playwright install chromium
+    • Try again
+
+  Option D: Reduce Frequency
+    • Only run the scraper once per day (max)
+    • Running too often gets you blocked
+    • Consider running only 1 city at a time
+
+
+❌ CAUSE 3: Slow Internet Connection
+─────────────────────────────────────
+
+SYMPTOM: Pages load slowly in the browser window
+
+SOLUTION:
+  • Check your internet speed
+  • Close other programs using bandwidth
+  • Try at a different time when internet is faster
+  • The updated script now waits longer (5 seconds instead of 3)
+
+
+❌ CAUSE 4: Google Maps Changed Their Design
+─────────────────────────────────────────────
+
+SYMPTOM: The search box looks different or is in a different place
+
+SOLUTION:
+  • Run TEST_CONNECTION.bat and send me the screenshots
+  • Google occasionally changes their layout
+  • The script may need updates to work with the new design
+
+
+❌ CAUSE 5: Antivirus/Firewall Blocking
+────────────────────────────────────────
+
+SYMPTOM: Browser opens but page won't load
+
+SOLUTION:
+  • Temporarily disable antivirus and try again
+  • Add Python and Playwright to firewall exceptions
+  • Some security software blocks automated browsers
+
+================================================================================
+
+🎯 QUICK FIXES TO TRY RIGHT NOW
+────────────────────────────────────────────────────────────────────────────
+
+Try these in order:
+
+1. ✅ RUN THE UPDATED SCRIPTS
+   The scripts I just updated have better cookie handling.
+   Try RUN_DEMO.bat again right now!
+
+2. ✅ WAIT A FEW HOURS
+   If Google blocked you, waiting 2-4 hours usually fixes it.
+
+3. ✅ SWITCH INTERNET CONNECTION
+   Use mobile hotspot instead of WiFi (or vice versa).
+
+4. ✅ RUN AT A DIFFERENT TIME
+   Late night (11pm - 6am) has less Google traffic and blocking.
+
+5. ✅ REDUCE SCALE
+   Instead of running all cities, edit the script to do just 1 city.
+
+================================================================================
+
+📝 HOW TO EDIT THE SCRIPT TO RUN JUST 1 CITY
+────────────────────────────────────────────────────────────────────────────
+
+If you want to reduce the load and avoid getting blocked:
+
+1. Open: texas_roofing_scraper_DEMO.py (right-click → Edit with Notepad)
+
+2. Find this section (around line 35):
+
+   TEXAS_MARKETS = {
+       "Houston": ["77002", "77019", "77056"],
+       "Dallas": ["75201", "75206", "75219"],
+       "Austin": ["78701", "78704", "78731"],
+   }
+
+3. Comment out cities you don't want (add # at the start):
+
+   TEXAS_MARKETS = {
+       "Houston": ["77002", "77019", "77056"],
+       # "Dallas": ["75201", "75206", "75219"],
+       # "Austin": ["78701", "78704", "78731"],
+   }
+
+4. Now it will only run Houston!
+
+5. Save and run RUN_DEMO.bat again
+
+================================================================================
+
+🚨 ULTIMATE SOLUTION: Use a Proxy Service
+────────────────────────────────────────────────────────────────────────────
+
+If nothing else works, you might need to use:
+  • Residential proxy services (costs money)
+  • Proxy rotation services (ScraperAPI, Bright Data, etc.)
+  • These make it look like requests come from different people
+  • More reliable but adds complexity
+
+This is advanced and costs money, but it's how professional scrapers work.
+
+================================================================================
+
+📊 WHAT I CHANGED IN THE UPDATED SCRIPTS
+────────────────────────────────────────────────────────────────────────────
+
+texas_roofing_scraper.py and texas_roofing_scraper_DEMO.py now:
+
+  ✓ Automatically detect and click cookie consent buttons
+  ✓ Wait longer for pages to load (5 seconds instead of 3)
+  ✓ Wait for search box to be visible before trying to use it
+  ✓ Click on search box before typing (more human-like)
+  ✓ Add small delays between actions (more realistic)
+
+These improvements should fix most timeout errors!
+
+================================================================================
+
+❓ STILL STUCK?
+────────────────────────────────────────────────────────────────────────────
+
+1. Run: TEST_CONNECTION.bat
+2. Look at the screenshots it creates
+3. Take a photo of what you see in the browser window
+4. Tell me what the screenshots show and I can help more!
+
+Common things I'll ask:
+  • Is there a CAPTCHA?
+  • Is there a cookie dialog?
+  • What does the page title say?
+  • Does the search box appear at all?
+
+================================================================================
+
+💡 PREVENTION TIPS
+────────────────────────────────────────────────────────────────────────────
+
+To avoid getting blocked in the future:
+
+  ✓ Run the scraper only once per day (max)
+  ✓ Run during off-peak hours (late night/early morning)
+  ✓ Start with the DEMO version to test
+  ✓ Don't run multiple scrapers at the same time
+  ✓ Use different zip codes each time if possible
+  ✓ Consider spreading the work over several days
+
+Remember: Web scraping is a cat-and-mouse game. Google actively tries to
+block bots, so you need to be patient and strategic!
+
+================================================================================
+
+🎯 TRY THIS RIGHT NOW
+────────────────────────────────────────────────────────────────────────────
+
+1. Double-click: RUN_DEMO.bat (try the updated version)
+2. If it still fails, double-click: TEST_CONNECTION.bat
+3. Look at the screenshots
+4. Wait 2-4 hours and try again
+5. Or switch to mobile hotspot and try immediately
+
+Good luck! 🚀
+
+================================================================================
