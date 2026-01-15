@@ -155,6 +155,31 @@ def is_duplicate(company_name, phone, existing_leads):
     return False
 
 
+def find_search_box(page):
+    """
+    Try multiple selectors to find the Google Maps search box.
+    Returns the search box element if found, None otherwise.
+    """
+    selectors = [
+        'input[id="searchboxinput"]',
+        'input[name="q"]',
+        'input[aria-label*="Search"]',
+        '#searchboxinput',
+        'form input[type="text"]',
+        '[role="search"] input'
+    ]
+
+    for selector in selectors:
+        try:
+            element = page.locator(selector).first
+            if element.count() > 0 and element.is_visible(timeout=2000):
+                return element
+        except:
+            continue
+
+    return None
+
+
 def scrape_google_maps_results(page, city, zip_code):
     """
     Scrape roofing companies from Google Maps for a specific city and zip code.
@@ -178,9 +203,15 @@ def scrape_google_maps_results(page, city, zip_code):
         except:
             pass  # No cookie dialog or already accepted
 
-        # Wait for search box to be available and visible
-        search_box = page.locator('input[id="searchboxinput"]')
-        search_box.wait_for(state="visible", timeout=10000)
+        # Try multiple selectors to find search box
+        search_box = find_search_box(page)
+
+        if not search_box:
+            raise Exception("Could not find search box with any known selector")
+
+        # Scroll to search box and interact
+        search_box.scroll_into_view_if_needed()
+        time.sleep(0.5)
         search_box.click()
         time.sleep(0.5)
 
