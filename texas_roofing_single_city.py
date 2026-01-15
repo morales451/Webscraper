@@ -114,6 +114,46 @@ def is_duplicate(company_name, phone, existing_leads):
     return False
 
 
+def is_valid_url(url):
+    """Check if a URL is valid and can be navigated to."""
+    if not url or url.strip() == "":
+        return False
+
+    url = url.strip()
+
+    if not (url.startswith('http://') or url.startswith('https://')):
+        url = 'https://' + url
+
+    try:
+        if any(char in url for char in ['<', '>', '{', '}', '|', '\\', '^', '`', '"']):
+            return False
+        if '.' not in url:
+            return False
+        if url in ['http://', 'https://']:
+            return False
+        return True
+    except:
+        return False
+
+
+def clean_url(url):
+    """Clean and normalize a URL before attempting to visit it."""
+    if not url or url.strip() == "":
+        return None
+
+    url = url.strip().strip('\'"')
+
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+
+    url = url.replace(' ', '')
+
+    if is_valid_url(url):
+        return url
+    else:
+        return None
+
+
 def find_search_box(page):
     """Try multiple selectors to find the Google Maps search box."""
     selectors = [
@@ -242,15 +282,23 @@ def classify_lead_tier(company, page, verbose=True):
             print(f"      ℹ️  {company_name[:40]}: No website → Tier 2")
         return "Tier 2", [], []
 
+    # Clean and validate URL before attempting to visit
+    cleaned_url = clean_url(website)
+
+    if not cleaned_url:
+        if verbose:
+            print(f"      ⚠️  {company_name[:40]}: Invalid URL format → Tier 3")
+        return "Tier 3", [], []
+
     try:
         if verbose:
-            print(f"      🌐 {company_name[:40]}: Checking {website[:50]}...")
+            print(f"      🌐 {company_name[:40]}: Checking {cleaned_url[:50]}...")
 
         # Random delay to avoid detection
         time.sleep(random.uniform(2, 4))
 
-        # Try to visit the website with longer timeout
-        page.goto(website, timeout=20000, wait_until='domcontentloaded')
+        # Try to visit the website with longer timeout (using cleaned URL)
+        page.goto(cleaned_url, timeout=20000, wait_until='domcontentloaded')
         time.sleep(2)
 
         # Get page content

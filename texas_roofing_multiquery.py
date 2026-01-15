@@ -31,25 +31,35 @@ import pandas as pd
 # ============================================================================
 
 SEARCH_QUERIES = [
-    "Roofing company",                    # Generic (finds big companies)
-    "Commercial roofing contractor",      # Commercial focus
-    "Roof coating specialist",            # Coating specialists (more likely Tier 1!)
-    "Roof restoration service",           # Restoration (more likely Tier 1!)
-    "Industrial roofing contractor",      # Industrial/commercial
+    # HIGH PRIORITY: Commercial & Coating Specialists (Most likely to be opportunities!)
+    "Commercial roofing contractor",      # 1st priority - commercial encounters most opportunities
+    "Roof coating specialist",            # 2nd priority - THE niche you want! (HIGH Tier 1 potential!)
+    "Roof restoration service",           # 3rd priority - restoration specialists (HIGH Tier 1 potential!)
+    "Roof waterproofing",                 # 4th priority - waterproofers (keyword overlap with Tier 1)
+
+    # MEDIUM PRIORITY: Specialists that often use coatings
     "Flat roof contractor",               # Flat roof specialists (often use coatings)
-    "Roof waterproofing",                 # Waterproofing (keyword overlap with Tier 1)
+    "Industrial roofing contractor",      # Industrial/commercial specialists
+    "TPO roofing contractor",             # Specific membrane type
+
+    # LOWER PRIORITY: General searches (for broader coverage)
+    "Roofing company",                    # Generic (finds big companies)
     "Metal roofing contractor",           # Metal roof specialists
     "Roof repair service",                # Repair-focused (smaller companies)
-    "TPO roofing contractor",             # Specific membrane type
 ]
 
-# You can customize which queries to use for faster/slower scans
-# For FAST scan (2-3 queries): Use queries 0, 2, 3
-# For MEDIUM scan (5 queries): Use queries 0, 1, 2, 3, 6
-# For MAXIMUM diversity (all 10): Use all queries
+# Query priority explained:
+# Queries 0-3: TARGET YOUR IDEAL CUSTOMERS (commercial + coatings/waterproofing)
+# Queries 4-6: Specialists that might do coatings
+# Queries 7-9: General coverage for volume
+
+# RECOMMENDED SETTINGS:
+# QUERIES_PER_ZIP = 3  (Uses top 3: commercial, coating, restoration) ⭐ BEST FOR YOUR NICHE!
+# QUERIES_PER_ZIP = 5  (Adds waterproofing + flat roof specialists)
+# QUERIES_PER_ZIP = 10 (Maximum coverage - all query types)
 
 # Set how many queries to use per zip code (1-10)
-QUERIES_PER_ZIP = 3  # Change this number to control scan depth
+QUERIES_PER_ZIP = 4  # Default to top 4 (commercial + all coating/waterproofing specialists)
 
 # ============================================================================
 # TEXAS MARKETS DICTIONARY
@@ -145,6 +155,67 @@ def is_duplicate(company_name, phone, existing_leads):
         if current_name and existing_name and current_name == existing_name:
             return True
     return False
+
+
+def is_valid_url(url):
+    """
+    Check if a URL is valid and can be navigated to.
+    Returns True if valid, False otherwise.
+    """
+    if not url or url.strip() == "":
+        return False
+
+    url = url.strip()
+
+    # Check if it starts with a valid protocol
+    if not (url.startswith('http://') or url.startswith('https://')):
+        # Try adding https://
+        url = 'https://' + url
+
+    # Basic URL validation
+    try:
+        # Check for invalid characters or patterns
+        if any(char in url for char in ['<', '>', '{', '}', '|', '\\', '^', '`', '"']):
+            return False
+
+        # Check if it has a domain
+        if '.' not in url:
+            return False
+
+        # Must have something after the protocol
+        if url in ['http://', 'https://']:
+            return False
+
+        return True
+    except:
+        return False
+
+
+def clean_url(url):
+    """
+    Clean and normalize a URL before attempting to visit it.
+    Returns cleaned URL or None if invalid.
+    """
+    if not url or url.strip() == "":
+        return None
+
+    url = url.strip()
+
+    # Remove any surrounding quotes or spaces
+    url = url.strip('\'"')
+
+    # Add protocol if missing
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+
+    # Remove invalid characters
+    url = url.replace(' ', '')
+
+    # Validate before returning
+    if is_valid_url(url):
+        return url
+    else:
+        return None
 
 
 def find_search_box(page):
@@ -272,17 +343,28 @@ def classify_lead_tier(company, page, verbose=True):
     company_name = company.get('Company Name', 'Unknown')
     website = company.get('Website', '')
 
+    # Check if website exists
     if not website or website.strip() == "":
         if verbose:
             print(f"         ℹ️  No website → Tier 2")
         return "Tier 2", [], []
 
+    # Clean and validate URL before attempting to visit
+    cleaned_url = clean_url(website)
+
+    if not cleaned_url:
+        if verbose:
+            print(f"         ⚠️  Invalid URL format → Tier 3")
+        return "Tier 3", [], []
+
     try:
         if verbose:
-            print(f"         🌐 Checking {website[:50]}...")
+            print(f"         🌐 Checking {cleaned_url[:50]}...")
 
         time.sleep(random.uniform(2, 4))
-        page.goto(website, timeout=20000, wait_until='domcontentloaded')
+
+        # Use the cleaned URL
+        page.goto(cleaned_url, timeout=20000, wait_until='domcontentloaded')
         time.sleep(2)
 
         page_text = page.inner_text('body')
