@@ -204,13 +204,16 @@ def clean_url(url):
     # Remove any surrounding quotes or spaces
     url = url.strip('\'"')
 
-    # Handle Google Maps redirect URLs
+    # Handle Google Maps redirect URLs (both absolute and relative)
     # Google sometimes wraps URLs like: https://www.google.com/url?q=https://actualwebsite.com
-    if 'google.com/url?q=' in url:
+    # Or as relative URLs like: /url?q=https://actualwebsite.com&opi=...
+    if 'google.com/url?q=' in url or url.startswith('/url?q='):
         try:
             # Extract the actual URL from Google's redirect
             actual_url = url.split('?q=')[1].split('&')[0]
-            url = actual_url
+            # URL decode if needed
+            from urllib.parse import unquote
+            url = unquote(actual_url)
         except:
             pass
 
