@@ -1,0 +1,170 @@
+================================================================================
+                  🚀 TEXAS ROOFING SCRAPER - START HERE! 🚀
+================================================================================
+
+          👋 COMPLETE BEGINNER? NO PROBLEM! JUST FOLLOW THESE STEPS:
+
+
+📋 STEP 1: INSTALL PYTHON (One-Time Setup)
+────────────────────────────────────────────────────────────────────────────
+
+   1. Go to: https://www.python.org/downloads/
+   2. Click the BIG YELLOW button: "Download Python 3.12.x"
+   3. Run the installer
+   4. ⚠️ IMPORTANT: CHECK THE BOX "Add Python to PATH" ⚠️
+   5. Click "Install Now"
+   6. Wait for it to finish
+   7. Restart your computer (important!)
+
+
+📦 STEP 2: RUN SETUP (One-Time Setup)
+────────────────────────────────────────────────────────────────────────────
+
+   1. Find the file: SETUP.bat
+   2. Double-click it
+   3. Wait 5-10 minutes (it's downloading stuff)
+   4. When you see "SETUP COMPLETE!", close the window
+
+   ✅ You only need to do this ONCE!
+
+
+🎮 STEP 3: TEST IT (Recommended!)
+────────────────────────────────────────────────────────────────────────────
+
+   1. Find the file: RUN_DEMO.bat
+   2. Double-click it
+   3. A Chrome browser will open (don't touch it!)
+   4. Wait 10-15 minutes
+   5. When done, check for: texas_roofing_leads_DEMO.xlsx
+
+   This is a quick test to make sure everything works!
+
+
+🚀 STEP 4: RUN THE FULL SCRAPER (When Ready)
+────────────────────────────────────────────────────────────────────────────
+
+   1. Find the file: RUN_FULL_SCRAPER.bat
+   2. Double-click it
+   3. A Chrome browser will open (don't touch it!)
+   4. Go to bed / do other work (this takes 2-4 HOURS!)
+   5. When done, open: texas_roofing_leads.xlsx
+
+   ⏰ Best to run this OVERNIGHT or while you're at work!
+
+
+================================================================================
+
+                              📁 WHAT EACH FILE DOES
+
+SETUP.bat                     → Run ONCE to install everything
+RUN_DEMO.bat                  → Quick 15-min test (3 zips per city)
+RUN_FULL_SCRAPER.bat          → Full 2-4 hour scan (all 150+ zips)
+
+texas_roofing_scraper.py      → The actual code (you don't need to open this)
+texas_roofing_scraper_DEMO.py → Demo version code
+requirements.txt              → List of what to install
+
+WINDOWS_SETUP_GUIDE.md        → Detailed instructions (if you get stuck)
+README_ROOFING_SCRAPER.md     → Full documentation
+
+================================================================================
+
+                           🎯 UNDERSTANDING YOUR RESULTS
+
+When the scraper finishes, you'll get an Excel file with your leads:
+
+  🌟 TIER 1 = HIGH VALUE LEADS
+     Companies with specialized roofing keywords (silicone coating, roof
+     restoration, etc.) - These are your BEST prospects!
+
+  🔧 TIER 2 = OPPORTUNITY LEADS
+     Companies without websites - Great for offering digital services!
+
+  📄 TIER 3 = STANDARD LEADS
+     Companies with websites but no specialized keywords
+
+
+The Excel file has columns for:
+  • Company Name
+  • Phone Number
+  • Email (scraped from their website)
+  • Website URL
+  • Address
+  • Which keywords were found
+  • Which city/zip they're from
+
+
+================================================================================
+
+                              ❓ TROUBLESHOOTING
+
+❌ "python is not recognized"
+   → You didn't check "Add Python to PATH" during Python installation
+   → Solution: Uninstall Python, reinstall it, CHECK THE BOX this time
+
+❌ SETUP.bat shows errors
+   → Make sure you installed Python first
+   → Make sure you have internet connection
+   → Try running SETUP.bat again
+
+❌ Browser doesn't open
+   → Run SETUP.bat again
+   → Make sure you have Chrome or Chromium installed
+
+❌ Taking too long / seems frozen
+   → It's not frozen! The script runs SLOWLY on purpose (to avoid getting
+     blocked by Google)
+   → You'll see progress bars showing it's working
+   → Full version genuinely takes 2-4 hours
+
+❌ Not finding many Tier 1 leads
+   → This is NORMAL! Most roofing companies don't use specialized coatings
+   → That's why Tier 1 leads are so valuable - they're rare!
+   → Even 20-30 Tier 1 leads is a great result
+
+
+================================================================================
+
+                            🎓 WANT TO CUSTOMIZE?
+
+You can edit the Python script to:
+  • Add more cities
+  • Add more zip codes
+  • Change the keywords
+  • Adjust timing
+
+See WINDOWS_SETUP_GUIDE.md for instructions on how to customize!
+
+
+================================================================================
+
+                              ⚡ QUICK SUMMARY
+
+  1. Install Python (check "Add to PATH"!)
+  2. Double-click: SETUP.bat (wait 5-10 min)
+  3. Double-click: RUN_DEMO.bat (test run - 15 min)
+  4. Double-click: RUN_FULL_SCRAPER.bat (full run - 2-4 hours)
+  5. Open the Excel file and enjoy your leads! 🎉
+
+
+================================================================================
+
+                          💡 TIPS FOR BEST RESULTS
+
+  ✓ Run the DEMO first to make sure everything works
+  ✓ Run the FULL version overnight or while at work
+  ✓ Don't close the browser window while it's running
+  ✓ Don't run multiple times per day (Google might block you)
+  ✓ Focus on TIER 1 leads - those are your money makers!
+
+
+================================================================================
+
+                              🎉 YOU'RE READY!
+
+Just follow the steps above and you'll have a spreadsheet full of qualified
+roofing leads in a few hours. No coding knowledge required!
+
+                              Good luck! 🚀
+
+================================================================================
