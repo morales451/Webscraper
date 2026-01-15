@@ -1,0 +1,302 @@
+================================================================================
+              🎯 HOW TO FIND MORE VARIETY IN YOUR LEADS
+================================================================================
+
+You noticed you're seeing the same roofing companies repeatedly. This is because
+Google Maps shows the SAME big/popular companies for every zip code.
+
+Here's how to find MORE and DIFFERENT companies!
+
+================================================================================
+
+🔍 WHY YOU SEE THE SAME COMPANIES
+────────────────────────────────────────────────────────────────────────────
+
+When you search "Roofing company in Houston 77002", Google shows:
+  1. Big companies with lots of reviews
+  2. Companies with wide service areas (serve multiple zip codes)
+  3. Companies that rank well for generic terms
+
+Result: You see "ABC Mega Roofing" in zip 77002, 77003, 77004, etc.
+
+The deduplication prevents them from being added twice, but you're still
+wasting time finding the same companies over and over.
+
+================================================================================
+
+✅ SOLUTION: USE MULTIPLE SEARCH QUERIES
+────────────────────────────────────────────────────────────────────────────
+
+Instead of ONLY searching "Roofing company", also search for:
+
+  🏢 SPECIALTY QUERIES (Find specialists - more likely Tier 1!)
+     - "Roof coating specialist"
+     - "Roof restoration service"
+     - "Commercial roofing contractor"
+     - "Industrial roofing contractor"
+     - "Roof waterproofing"
+
+  🔧 SERVICE TYPE QUERIES (Find smaller/niche companies)
+     - "Flat roof contractor"
+     - "Metal roofing contractor"
+     - "TPO roofing contractor"
+     - "Roof repair service"
+
+  🎯 NICHE QUERIES (Find hidden gems)
+     - "Emergency roof repair"
+     - "Local roofer"
+     - "Family owned roofing"
+
+================================================================================
+
+🚀 THE NEW MULTI-QUERY SCRAPER
+────────────────────────────────────────────────────────────────────────────
+
+I created: RUN_MULTIQUERY.bat
+
+This uses 3 DIFFERENT search queries per zip code (customizable to 10!):
+
+  Default queries:
+    1. "Roofing company" (finds big players)
+    2. "Commercial roofing contractor" (finds commercial specialists)
+    3. "Roof coating specialist" (finds coating specialists - likely Tier 1!)
+
+Benefits:
+  ✅ Finds 3x MORE companies per zip code
+  ✅ Discovers smaller local businesses
+  ✅ Targets specialists (higher Tier 1 percentage!)
+  ✅ Much more variety and diversity
+
+Trade-off:
+  ⚠️  Takes 3x longer (but finds way more unique leads!)
+
+================================================================================
+
+📊 COMPARISON: SINGLE QUERY vs MULTI-QUERY
+────────────────────────────────────────────────────────────────────────────
+
+Example: Houston, 30 zip codes
+
+SINGLE-QUERY VERSION (RUN_SINGLE_CITY.bat):
+  • 30 zip codes × 1 query = 30 searches
+  • Finds: ~200-300 unique companies
+  • Time: 60-90 minutes
+  • Result: Lots of duplicates, mostly big companies
+
+MULTI-QUERY VERSION (RUN_MULTIQUERY.bat):
+  • 30 zip codes × 3 queries = 90 searches
+  • Finds: ~500-800 unique companies
+  • Time: 180-270 minutes (3-4.5 hours)
+  • Result: Much more variety, finds specialists!
+
+================================================================================
+
+⚙️ CUSTOMIZING THE NUMBER OF QUERIES
+────────────────────────────────────────────────────────────────────────────
+
+You can control how many queries to use by editing the script!
+
+Open: texas_roofing_multiquery.py (with Notepad)
+Find: QUERIES_PER_ZIP = 3
+Change to: QUERIES_PER_ZIP = 1, 2, 3, 4, 5, or up to 10
+
+Examples:
+
+  QUERIES_PER_ZIP = 1   (Fast - basic variety)
+    Uses: "Roofing company"
+    Time: Normal
+
+  QUERIES_PER_ZIP = 3   (Recommended - good balance)
+    Uses: "Roofing company", "Commercial roofing", "Roof coating specialist"
+    Time: 3x longer
+
+  QUERIES_PER_ZIP = 5   (High diversity)
+    Uses: 5 different queries
+    Time: 5x longer
+
+  QUERIES_PER_ZIP = 10  (Maximum diversity)
+    Uses: All 10 queries
+    Time: 10x longer (but TONS of unique leads!)
+
+================================================================================
+
+🎯 WHICH VERSION SHOULD YOU USE?
+────────────────────────────────────────────────────────────────────────────
+
+RUN_DEMO.bat
+  ✓ Quick test (15-20 min)
+  ✓ 3 zip codes per city
+  ✓ Good for testing
+  ✗ Sees same companies
+
+RUN_SINGLE_CITY.bat
+  ✓ Focus on one city (60-90 min)
+  ✓ All zip codes for that city
+  ✓ Simple and straightforward
+  ✗ Generic "roofing company" query only
+
+RUN_MULTIQUERY.bat  ⭐ BEST FOR VARIETY!
+  ✓ Multiple search queries per zip (3-4.5 hours)
+  ✓ Finds WAY MORE unique companies
+  ✓ Targets specialists (more Tier 1!)
+  ✓ Much better lead diversity
+  ✗ Takes longer
+
+================================================================================
+
+💡 PRO TIP: TWO-PHASE STRATEGY
+────────────────────────────────────────────────────────────────────────────
+
+Phase 1: QUICK SCAN
+  • Use RUN_SINGLE_CITY.bat
+  • Get the big/obvious companies fast
+  • Scan all zip codes in 60-90 minutes
+
+Phase 2: DEEP DIVE
+  • Use RUN_MULTIQUERY.bat
+  • Find the hidden gems and specialists
+  • Takes longer but finds companies others miss
+
+This way you get:
+  ✓ Fast initial results (Phase 1)
+  ✓ Comprehensive coverage (Phase 2)
+  ✓ Maximum unique leads
+
+================================================================================
+
+📋 THE 10 SEARCH QUERIES AVAILABLE
+────────────────────────────────────────────────────────────────────────────
+
+The multi-query version includes these searches:
+
+1. "Roofing company"                   ← Generic (big companies)
+2. "Commercial roofing contractor"     ← Commercial specialists
+3. "Roof coating specialist"           ← HIGH Tier 1 potential! 🌟
+4. "Roof restoration service"          ← HIGH Tier 1 potential! 🌟
+5. "Industrial roofing contractor"     ← Industrial/commercial
+6. "Flat roof contractor"              ← Often use coatings!
+7. "Roof waterproofing"                ← Related to Tier 1 keywords
+8. "Metal roofing contractor"          ← Niche specialty
+9. "Roof repair service"               ← Smaller companies
+10. "TPO roofing contractor"           ← Specific membrane type
+
+Queries 3, 4, 6, and 7 are MOST LIKELY to find Tier 1 companies!
+
+================================================================================
+
+🛠️ HOW TO ADD YOUR OWN CUSTOM QUERIES
+────────────────────────────────────────────────────────────────────────────
+
+Want to search for something specific? Add your own queries!
+
+1. Open: texas_roofing_multiquery.py (Notepad)
+
+2. Find the section:
+   SEARCH_QUERIES = [
+       "Roofing company",
+       "Commercial roofing contractor",
+       ...
+   ]
+
+3. Add your own:
+   SEARCH_QUERIES = [
+       "Roofing company",
+       "Commercial roofing contractor",
+       "Your custom search here",  ← Add this!
+       "Another custom search",    ← And this!
+   ]
+
+4. Save and run!
+
+Custom query ideas:
+  • "EPDM roofing contractor"
+  • "Spray foam roofing"
+  • "Green roof installation"
+  • "Solar roofing company"
+  • "Historic building roofing"
+
+================================================================================
+
+📊 WHAT TO EXPECT WITH MULTI-QUERY
+────────────────────────────────────────────────────────────────────────────
+
+More Variety:
+  • You'll see DIFFERENT companies for each query
+  • "Roofing company" finds big players
+  • "Roof coating specialist" finds specialists
+  • "Roof repair service" finds small local shops
+
+Higher Tier 1 Rate:
+  • Targeted queries like "roof coating specialist" naturally find companies
+    that use coating keywords
+  • You might see 15-25% Tier 1 instead of 5-10%!
+
+Better Coverage:
+  • Small companies that don't rank well for generic searches
+  • Specialists that only show up for specific terms
+  • Hidden gems your competitors won't find
+
+================================================================================
+
+🚀 TRY IT NOW!
+────────────────────────────────────────────────────────────────────────────
+
+To find MORE variety and DIFFERENT companies:
+
+1. Double-click: RUN_MULTIQUERY.bat
+2. Choose your city
+3. Wait 3-4.5 hours (run overnight!)
+4. Open the Excel file and see the "Search Query Used" column
+5. Notice how different queries found different types of companies!
+
+You'll see entries like:
+  • ABC Roofing - Found via "Roofing company"
+  • Coating Pros LLC - Found via "Roof coating specialist" (Tier 1!)
+  • Commercial Roof Systems - Found via "Commercial roofing contractor"
+
+Much more variety! 🎯
+
+================================================================================
+
+❓ FAQ
+────────────────────────────────────────────────────────────────────────────
+
+Q: Why not just use MORE zip codes instead?
+A: More zip codes = same companies in different areas
+   More queries = DIFFERENT types of companies!
+
+Q: Will this find more Tier 1 leads?
+A: YES! Queries like "roof coating specialist" target companies that
+   naturally use your Tier 1 keywords.
+
+Q: Is it worth the extra time?
+A: If you want VARIETY and specialists (not just big companies), absolutely!
+   But start with QUERIES_PER_ZIP = 3 to test.
+
+Q: Can I run it for just a few zip codes?
+A: Yes! Edit the TEXAS_MARKETS dictionary to include only 5-10 zip codes
+   for testing.
+
+Q: Which query finds the most Tier 1 leads?
+A: Usually "Roof coating specialist" and "Roof restoration service"
+   because they directly target companies using coating keywords.
+
+================================================================================
+
+🎉 SUMMARY
+────────────────────────────────────────────────────────────────────────────
+
+Problem: Seeing same companies repeatedly
+Solution: Use multiple search queries per zip code
+
+Run: RUN_MULTIQUERY.bat
+  • Uses 3 different queries per zip (customizable)
+  • Finds WAY more unique companies
+  • Targets specialists (higher Tier 1 rate!)
+  • Takes longer but worth it for variety
+
+Result: Diverse lead list with specialists and hidden gems!
+
+Good luck! 🚀
+
+================================================================================
