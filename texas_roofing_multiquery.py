@@ -204,6 +204,20 @@ def clean_url(url):
     # Remove any surrounding quotes or spaces
     url = url.strip('\'"')
 
+    # Handle Google Maps redirect URLs
+    # Google sometimes wraps URLs like: https://www.google.com/url?q=https://actualwebsite.com
+    if 'google.com/url?q=' in url:
+        try:
+            # Extract the actual URL from Google's redirect
+            actual_url = url.split('?q=')[1].split('&')[0]
+            url = actual_url
+        except:
+            pass
+
+    # Handle URLs that start with www. but no protocol
+    if url.startswith('www.'):
+        url = 'https://' + url
+
     # Add protocol if missing
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
@@ -305,9 +319,22 @@ def scrape_google_maps_results(page, city, zip_code, query_base):
 
                 website = ""
                 try:
+                    # Try multiple methods to get the website
                     website_link = page.locator('a[data-item-id="authority"]').first
                     if website_link.count() > 0:
                         website = website_link.get_attribute('href')
+
+                        # If href is empty or invalid, try getting the visible text
+                        if not website or website.strip() == "":
+                            website_text = website_link.inner_text()
+                            if website_text and ('.' in website_text):
+                                website = website_text
+
+                    # Fallback: look for any link with "Website" text nearby
+                    if not website:
+                        website_links = page.locator('a:has-text("Website"), a[aria-label*="Website"]').all()
+                        if len(website_links) > 0:
+                            website = website_links[0].get_attribute('href')
                 except:
                     pass
 
@@ -349,16 +376,22 @@ def classify_lead_tier(company, page, verbose=True):
             print(f"         ℹ️  No website → Tier 2")
         return "Tier 2", [], []
 
+    # Show raw URL for debugging
+    if verbose:
+        print(f"         📋 Raw URL: {website[:60]}")
+
     # Clean and validate URL before attempting to visit
     cleaned_url = clean_url(website)
 
     if not cleaned_url:
         if verbose:
-            print(f"         ⚠️  Invalid URL format → Tier 3")
+            print(f"         ⚠️  Invalid URL format (couldn't clean) → Tier 3")
         return "Tier 3", [], []
 
     try:
         if verbose:
+            if cleaned_url != website:
+                print(f"         🧹 Cleaned to: {cleaned_url[:60]}")
             print(f"         🌐 Checking {cleaned_url[:50]}...")
 
         time.sleep(random.uniform(2, 4))

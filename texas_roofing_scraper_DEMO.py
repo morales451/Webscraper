@@ -114,6 +114,19 @@ def clean_url(url):
     if not url or url.strip() == "":
         return None
     url = url.strip().strip('\'"')
+
+    # Handle Google Maps redirect URLs
+    if 'google.com/url?q=' in url:
+        try:
+            actual_url = url.split('?q=')[1].split('&')[0]
+            url = actual_url
+        except:
+            pass
+
+    # Handle URLs that start with www. but no protocol
+    if url.startswith('www.'):
+        url = 'https://' + url
+
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
     url = url.replace(' ', '')

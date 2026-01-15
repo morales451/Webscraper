@@ -143,6 +143,18 @@ def clean_url(url):
 
     url = url.strip().strip('\'"')
 
+    # Handle Google Maps redirect URLs
+    if 'google.com/url?q=' in url:
+        try:
+            actual_url = url.split('?q=')[1].split('&')[0]
+            url = actual_url
+        except:
+            pass
+
+    # Handle URLs that start with www. but no protocol
+    if url.startswith('www.'):
+        url = 'https://' + url
+
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
 
@@ -240,9 +252,22 @@ def scrape_google_maps_results(page, city, zip_code):
 
                 website = ""
                 try:
+                    # Try multiple methods to get the website
                     website_link = page.locator('a[data-item-id="authority"]').first
                     if website_link.count() > 0:
                         website = website_link.get_attribute('href')
+
+                        # If href is empty or invalid, try getting the visible text
+                        if not website or website.strip() == "":
+                            website_text = website_link.inner_text()
+                            if website_text and ('.' in website_text):
+                                website = website_text
+
+                    # Fallback: look for any link with "Website" text nearby
+                    if not website:
+                        website_links = page.locator('a:has-text("Website"), a[aria-label*="Website"]').all()
+                        if len(website_links) > 0:
+                            website = website_links[0].get_attribute('href')
                 except:
                     pass
 
@@ -282,6 +307,10 @@ def classify_lead_tier(company, page, verbose=True):
             print(f"      ℹ️  {company_name[:40]}: No website → Tier 2")
         return "Tier 2", [], []
 
+    # Show raw URL for debugging
+    if verbose:
+        print(f"      📋 {company_name[:40]}: Raw URL: {website[:60]}")
+
     # Clean and validate URL before attempting to visit
     cleaned_url = clean_url(website)
 
@@ -292,6 +321,8 @@ def classify_lead_tier(company, page, verbose=True):
 
     try:
         if verbose:
+            if cleaned_url != website:
+                print(f"      🧹 {company_name[:40]}: Cleaned to: {cleaned_url[:60]}")
             print(f"      🌐 {company_name[:40]}: Checking {cleaned_url[:50]}...")
 
         # Random delay to avoid detection
