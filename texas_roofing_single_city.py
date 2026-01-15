@@ -1,13 +1,14 @@
 """
-Texas Roofing Company Lead Generator - DEMO VERSION
-===================================================
+Texas Roofing Company Lead Generator - SINGLE CITY VERSION
+==========================================================
 
-This is a DEMO version with only 3 zip codes per city for quick testing.
-Perfect for testing if everything is set up correctly before running the full scan.
+Choose ONE city to focus on and scan all its zip codes.
+Perfect for focused prospecting in a specific market!
 
-Expected runtime: 10-15 minutes
-
-For the full version with all zip codes, use: texas_roofing_scraper.py
+This version also has VERBOSE logging so you can see:
+- Which websites are being visited
+- Whether keywords are found
+- Why leads are classified as Tier 1, 2, or 3
 """
 
 import re
@@ -18,18 +19,41 @@ from tqdm import tqdm
 import pandas as pd
 
 # ============================================================================
-# DEMO TEXAS MARKETS (ONLY 3 ZIP CODES PER CITY FOR TESTING)
+# TEXAS MARKETS DICTIONARY
 # ============================================================================
 
 TEXAS_MARKETS = {
-    "Houston": ["77002", "77019", "77056"],  # Only 3 zips for demo
-    "Dallas": ["75201", "75206", "75219"],   # Only 3 zips for demo
-    "Austin": ["78701", "78704", "78731"],   # Only 3 zips for demo
+    "Houston": [
+        "77002", "77003", "77004", "77005", "77006", "77007", "77008", "77009",
+        "77010", "77019", "77020", "77021", "77025", "77027", "77030", "77035",
+        "77036", "77042", "77045", "77047", "77051", "77054", "77056", "77057",
+        "77063", "77064", "77072", "77077", "77081", "77084"
+    ],
+    "Dallas": [
+        "75201", "75202", "75203", "75204", "75205", "75206", "75207", "75208",
+        "75209", "75210", "75211", "75212", "75214", "75215", "75216", "75217",
+        "75218", "75219", "75220", "75223", "75224", "75225", "75226", "75227",
+        "75228", "75229", "75230", "75231", "75232", "75233"
+    ],
+    "Austin": [
+        "78701", "78702", "78703", "78704", "78705", "78717", "78721", "78722",
+        "78723", "78724", "78725", "78726", "78727", "78728", "78729", "78730",
+        "78731", "78732", "78733", "78734", "78735", "78736", "78737", "78738",
+        "78739", "78741", "78742", "78744", "78745", "78746"
+    ],
+    "San Antonio": [
+        "78201", "78202", "78203", "78204", "78205", "78207", "78208", "78209",
+        "78210", "78211", "78212", "78213", "78214", "78215", "78216", "78217",
+        "78218", "78219", "78220", "78221", "78222", "78223", "78224", "78225",
+        "78226", "78227", "78228", "78229", "78230", "78231"
+    ],
+    "Fort Worth": [
+        "76101", "76102", "76103", "76104", "76105", "76106", "76107", "76108",
+        "76109", "76110", "76111", "76112", "76114", "76115", "76116", "76117",
+        "76118", "76119", "76120", "76122", "76123", "76126", "76127", "76129",
+        "76131", "76132", "76133", "76134", "76135", "76137"
+    ]
 }
-
-# ============================================================================
-# KEYWORD LIST FOR TIER 1 CLASSIFICATION
-# ============================================================================
 
 TARGET_KEYWORDS = [
     "fluid applied",
@@ -121,23 +145,19 @@ def scrape_google_maps_results(page, city, zip_code):
         page.goto("https://www.google.com/maps", timeout=30000)
         time.sleep(3)
 
-        # Handle cookie consent dialog if it appears
         try:
-            # Try to click "Accept all" or "Reject all" button for cookies
             accept_button = page.locator('button:has-text("Accept all"), button:has-text("Reject all"), form:has-text("Accept") >> button').first
             if accept_button.is_visible(timeout=3000):
                 accept_button.click()
                 time.sleep(2)
         except:
-            pass  # No cookie dialog or already accepted
+            pass
 
-        # Try multiple selectors to find search box
         search_box = find_search_box(page)
 
         if not search_box:
             raise Exception("Could not find search box with any known selector")
 
-        # Scroll to search box and interact
         search_box.scroll_into_view_if_needed()
         time.sleep(0.5)
         search_box.click()
@@ -145,7 +165,7 @@ def scrape_google_maps_results(page, city, zip_code):
         search_box.fill(search_query)
         time.sleep(0.5)
         search_box.press("Enter")
-        time.sleep(5)  # Increased wait time for results to load
+        time.sleep(5)
 
         results_panel = page.locator('div[role="feed"]').first
         for _ in range(3):
@@ -212,44 +232,49 @@ def scrape_google_maps_results(page, city, zip_code):
     return companies
 
 
-def classify_lead_tier(company, page, verbose=False):
-    """Classify a lead into Tier 1, 2, or 3 with optional verbose logging."""
+def classify_lead_tier(company, page, verbose=True):
+    """Classify a lead into Tier 1, 2, or 3 with verbose logging."""
     company_name = company.get('Company Name', 'Unknown')
     website = company.get('Website', '')
 
     if not website or website.strip() == "":
         if verbose:
-            print(f"         ℹ️  No website → Tier 2")
+            print(f"      ℹ️  {company_name[:40]}: No website → Tier 2")
         return "Tier 2", [], []
 
     try:
         if verbose:
-            print(f"         🌐 Checking {website[:50]}...")
+            print(f"      🌐 {company_name[:40]}: Checking {website[:50]}...")
 
-        # Reduced delay but still anti-bot
+        # Random delay to avoid detection
         time.sleep(random.uniform(2, 4))
 
-        # Increased timeout for slow websites
+        # Try to visit the website with longer timeout
         page.goto(website, timeout=20000, wait_until='domcontentloaded')
         time.sleep(2)
 
+        # Get page content
         page_text = page.inner_text('body')
+
+        # Extract emails
         emails = extract_emails(page_text)
+
+        # Check for keywords
         keywords_found = check_for_keywords(page_text)
 
         if keywords_found:
             if verbose:
-                print(f"         ✅ TIER 1! Found: {', '.join(keywords_found[:3])}")
+                print(f"         ✅ TIER 1! Found keywords: {', '.join(keywords_found[:3])}")
             return "Tier 1", keywords_found, emails
         else:
             if verbose:
-                print(f"         📄 Tier 3 (no keywords found)")
+                print(f"         📄 Tier 3 (website loads but no keywords)")
             return "Tier 3", [], emails
 
     except Exception as e:
-        error_msg = str(e)[:80]
+        error_msg = str(e)[:100]
         if verbose:
-            print(f"         ⚠️  Tier 3 (error: {error_msg})")
+            print(f"         ⚠️  Tier 3 (couldn't load website: {error_msg})")
         return "Tier 3", [], []
 
 
@@ -258,16 +283,47 @@ def classify_lead_tier(company, page, verbose=False):
 # ============================================================================
 
 def scrape_texas_roofing_companies():
-    """Main scraping function."""
+    """Main scraping function with city selection."""
     print("=" * 80)
-    print("🏢 TEXAS ROOFING COMPANY LEAD GENERATOR - DEMO VERSION (VERBOSE)")
+    print("🏢 TEXAS ROOFING COMPANY LEAD GENERATOR - SINGLE CITY VERSION")
     print("=" * 80)
-    print("⚡ This demo version scans only 3 zip codes per city for quick testing")
-    print("🔍 VERBOSE MODE: You'll see detailed tier classification for each lead")
-    print(f"📍 Cities to scan: {', '.join(TEXAS_MARKETS.keys())}")
-    print(f"📊 Total zip codes: {sum(len(zips) for zips in TEXAS_MARKETS.values())}")
-    print("⏱️  Expected runtime: 15-20 minutes")
+    print()
+    print("Available cities:")
+    cities = list(TEXAS_MARKETS.keys())
+    for i, city in enumerate(cities, 1):
+        zip_count = len(TEXAS_MARKETS[city])
+        print(f"  {i}. {city} ({zip_count} zip codes)")
+
+    print()
     print("=" * 80)
+    print()
+
+    # Get user choice
+    while True:
+        try:
+            choice = input("Enter city number (1-5): ").strip()
+            choice_num = int(choice)
+            if 1 <= choice_num <= len(cities):
+                selected_city = cities[choice_num - 1]
+                break
+            else:
+                print(f"Please enter a number between 1 and {len(cities)}")
+        except ValueError:
+            print("Please enter a valid number")
+        except KeyboardInterrupt:
+            print("\n\nCancelled by user.")
+            return
+
+    zip_codes = TEXAS_MARKETS[selected_city]
+
+    print()
+    print("=" * 80)
+    print(f"🎯 You selected: {selected_city.upper()}")
+    print(f"📊 Will scan {len(zip_codes)} zip codes")
+    print(f"⏱️  Expected runtime: {len(zip_codes) * 2} - {len(zip_codes) * 3} minutes")
+    print("=" * 80)
+    print()
+    input("Press Enter to start scraping...")
     print()
 
     all_leads = []
@@ -280,32 +336,30 @@ def scrape_texas_roofing_companies():
         )
         page = context.new_page()
 
-        for city, zip_codes in TEXAS_MARKETS.items():
-            print(f"\n🌆 Starting {city.upper()}")
-            print(f"   Scanning {len(zip_codes)} zip codes...\n")
+        print(f"\n🌆 Starting {selected_city.upper()}")
+        print(f"   Scanning {len(zip_codes)} zip codes...\n")
 
-            for zip_code in tqdm(zip_codes, desc=f"   {city}", unit="zip"):
-                print(f"\n      📍 Zip: {zip_code}")
-                companies = scrape_google_maps_results(page, city, zip_code)
-                print(f"         Found {len(companies)} companies, classifying...")
+        for zip_code in tqdm(zip_codes, desc=f"   {selected_city}", unit="zip"):
+            print(f"\n   📍 Zip: {zip_code}")
+            companies = scrape_google_maps_results(page, selected_city, zip_code)
+            print(f"      Found {len(companies)} companies")
 
-                for company in companies:
-                    if is_duplicate(company['Company Name'], company['Phone'], all_leads):
-                        print(f"         ⏭️  {company['Company Name'][:40]}: Duplicate")
-                        continue
+            for company in companies:
+                if is_duplicate(company['Company Name'], company['Phone'], all_leads):
+                    print(f"      ⏭️  {company['Company Name'][:40]}: Duplicate, skipping")
+                    continue
 
-                    print(f"      📋 {company['Company Name'][:45]}")
-                    tier, keywords, emails = classify_lead_tier(company, page, verbose=True)
+                tier, keywords, emails = classify_lead_tier(company, page, verbose=True)
 
-                    company['Lead Tier'] = tier
-                    company['Keywords Found'] = ', '.join(keywords) if keywords else ''
-                    company['Email'] = ', '.join(emails) if emails else ''
+                company['Lead Tier'] = tier
+                company['Keywords Found'] = ', '.join(keywords) if keywords else ''
+                company['Email'] = ', '.join(emails) if emails else ''
 
-                    all_leads.append(company)
+                all_leads.append(company)
 
-                time.sleep(1)
+            time.sleep(1)
 
-            print(f"   ✅ {city} complete! Found {len([l for l in all_leads if l['City'] == city])} unique leads.")
+        print(f"\n   ✅ {selected_city} complete! Found {len(all_leads)} unique leads.")
 
         browser.close()
 
@@ -320,9 +374,9 @@ def scrape_texas_roofing_companies():
             'Website', 'Keywords Found', 'Address', 'Zip Code Used'
         ]
         df = df[column_order]
-        df = df.sort_values(['City', 'Lead Tier'])
+        df = df.sort_values(['Lead Tier'])
 
-        output_file = 'texas_roofing_leads_DEMO.xlsx'
+        output_file = f'{selected_city.lower()}_roofing_leads.xlsx'
         df.to_excel(output_file, index=False, engine='openpyxl')
 
         print(f"✅ SUCCESS! Saved {len(all_leads)} unique leads to '{output_file}'")
@@ -334,14 +388,9 @@ def scrape_texas_roofing_companies():
         print("⚠️  No leads found. Please check your internet connection and try again.")
 
     print("=" * 80)
-    print("🎉 DEMO scraping complete!")
-    print("💡 To run the full version with all zip codes, use: texas_roofing_scraper.py")
+    print("🎉 Scraping complete!")
     print("=" * 80)
 
-
-# ============================================================================
-# SCRIPT ENTRY POINT
-# ============================================================================
 
 if __name__ == "__main__":
     try:
