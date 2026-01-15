@@ -368,8 +368,101 @@ def scrape_google_maps_results(page, city, zip_code, query_base):
     return companies
 
 
+def try_click_service_dropdowns(page, verbose=False):
+    """Try to click on service-related dropdowns/menus to reveal hidden content."""
+    revealed_text = ""
+
+    # Common selectors for service dropdowns/menus
+    service_selectors = [
+        'a:has-text("Services")',
+        'button:has-text("Services")',
+        'a:has-text("What We Do")',
+        'button:has-text("What We Do")',
+        'a:has-text("Products")',
+        'button:has-text("Products")',
+        '[aria-label*="Services"]',
+        '[aria-label*="Menu"]',
+    ]
+
+    for selector in service_selectors:
+        try:
+            element = page.locator(selector).first
+            if element.count() > 0 and element.is_visible(timeout=1000):
+                # Try to hover/click to reveal dropdown
+                element.hover(timeout=2000)
+                time.sleep(0.5)
+
+                # Get any revealed content
+                try:
+                    dropdown_content = page.locator('nav, .dropdown, .menu, [role="menu"]').all_inner_texts()
+                    revealed_text += ' '.join(dropdown_content)
+                except:
+                    pass
+
+                break  # Only click the first one we find
+        except:
+            continue
+
+    return revealed_text
+
+
+def try_visit_service_pages(page, base_url, verbose=False):
+    """Try to find and visit service-related pages to get more content."""
+    all_text = ""
+
+    # Common service page patterns
+    service_page_patterns = [
+        'services',
+        'what-we-do',
+        'products',
+        'solutions',
+        'our-services',
+        'commercial-services',
+    ]
+
+    # First, try to find links on the current page
+    service_links = []
+    for pattern in service_page_patterns:
+        try:
+            links = page.locator(f'a[href*="{pattern}"]').all()
+            for link in links[:2]:  # Only check first 2 matches per pattern
+                try:
+                    href = link.get_attribute('href')
+                    if href and href not in service_links:
+                        service_links.append(href)
+                except:
+                    pass
+        except:
+            continue
+
+    # Visit each service link (max 2 to keep it fast)
+    for link in service_links[:2]:
+        try:
+            # Make link absolute if it's relative
+            if link.startswith('/'):
+                link = base_url.rstrip('/') + link
+            elif not link.startswith('http'):
+                link = base_url.rstrip('/') + '/' + link
+
+            if verbose:
+                print(f"            🔍 Checking: {link[:40]}...")
+
+            page.goto(link, timeout=15000, wait_until='domcontentloaded')
+            time.sleep(1)
+
+            page_text = page.inner_text('body')
+            all_text += ' ' + page_text
+
+        except Exception as e:
+            if verbose:
+                print(f"            ⚠️  Couldn't load service page: {str(e)[:40]}")
+            continue
+
+    return all_text
+
+
 def classify_lead_tier(company, page, verbose=True):
-    """Classify a lead into Tier 1, 2, or 3 with verbose logging."""
+    """Classify a lead into Tier 1, 2, or 3 with enhanced multi-page checking."""
     company_name = company.get('Company Name', 'Unknown')
     website = company.get('Website', '')
 
@@ -403,7 +496,26 @@ def classify_lead_tier(company, page, verbose=True):
         page.goto(cleaned_url, timeout=20000, wait_until='domcontentloaded')
         time.sleep(2)
 
+        # Get homepage text
         page_text = page.inner_text('body')
+
+        # Try to click service dropdowns to reveal hidden content
+        try:
+            dropdown_text = try_click_service_dropdowns(page, verbose=verbose)
+            if dropdown_text:
+                page_text += ' ' + dropdown_text
+        except:
+            pass
+
+        # Try to visit service pages for more content
+        try:
+            service_page_text = try_visit_service_pages(page, cleaned_url, verbose=verbose)
+            if service_page_text:
+                page_text += ' ' + service_page_text
+        except:
+            pass
+
+        # Extract emails and check for keywords from ALL collected text
         emails = extract_emails(page_text)
         keywords_found = check_for_keywords(page_text)
 
@@ -418,8 +530,16 @@ def classify_lead_tier(company, page, verbose=True):
 
     except Exception as e:
         error_msg = str(e)[:80]
+        # Better error handling - don't let 403/timeout stop the whole script
         if verbose:
-            print(f"         ⚠️  Tier 3 (error: {error_msg})")
+            if '403' in error_msg or 'Forbidden' in error_msg:
+                print(f"         ⚠️  Tier 3 (403 Forbidden - site blocking us)")
+            elif 'Timeout' in error_msg or 'timeout' in error_msg:
+                print(f"         ⚠️  Tier 3 (timeout - site too slow)")
+            elif 'net::' in error_msg:
+                print(f"         ⚠️  Tier 3 (connection error)")
+            else:
+                print(f"         ⚠️  Tier 3 (error: {error_msg})")
         return "Tier 3", [], []
 
 
